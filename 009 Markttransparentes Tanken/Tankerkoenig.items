@@ -1,0 +1,26 @@
+// jp 3.8.2023
+
+
+Group       Tankerkoenig                                              "Sprit Preise"
+Group       Tankerkoenig_Preise                                       "Sprit Preise: min, max, aktuell"
+Group       Tankerkoenig_Preise_Datum                                 "Sprit Preise Datum: min, max"
+
+Switch      triggerTankerkoenig                                       "Trigger Rule Tankerkönig"                                      <car>
+
+Switch      Tankerkonig_Konto_Holiday                                 "Feiertag"                                                      <calendar>    (Tankerkoenig)                               {channel="tankerkoenig:webservice:0fed0de32c:holiday"}
+
+Number      Tankstelle_Frei_A_Diesel                                  "Freie A: Diesel aktuell [%,.3f €]"                             <car>         (Tankerkoenig, Tankerkoenig_Preise)          {channel="tankerkoenig:station:0fed0de32c:9dd0a482b6:diesel"}
+DateTime    Tankstelle_Frei_A_Diesel_Datum                            "...Preis um [%1$tH:%1$tMh]"                                    <time>        (Tankerkoenig, Tankerkoenig_Preise_Datum)
+// Number     Tankstelle_Frei_A_E10             "Freie Tankstelle AE10 [%,.3f]"        <car>    (Tankerkoenig)    {channel="tankerkoenig:station:0fed0de32c:9dd0a482b6:e10"}
+// Number     Tankstelle_Frei_A_E5              "Freie Tankstelle AE5 [%,.3f]"         <car>    (Tankerkoenig)    {channel="tankerkoenig:station:0fed0de32c:9dd0a482b6:e5"}
+Contact     Tankstelle_Frei_A_Station_Open                            "Geöffnet/geschlossen [%s]"                                     <door>        (Tankerkoenig)                               {channel="tankerkoenig:station:0fed0de32c:9dd0a482b6:station_open"}
+
+Number      Tankstelle_Frei_A_Diesel_7Tage_Tiefpreis                  "Freie A: 7 Tage-Tief [%,.3f €]"                                <price>       (Tankerkoenig, Tankerkoenig_Preise)
+DateTime    Tankstelle_Frei_A_Diesel_7Tage_Tiefpreis_Datum            "Tiefpreis am [%1$ta, %1$td.%1$tm., %1$tH:%1$tMh]"              <time>        (Tankerkoenig, Tankerkoenig_Preise_Datum)
+
+Number      Tankstelle_Frei_A_Diesel_7Tage_Hoechstpreis               "Freie A: 7 Tage-Hoch [%,.3f €]"                                <alarm>       (Tankerkoenig, Tankerkoenig_Preise)
+DateTime    Tankstelle_Frei_A_Diesel_7Tage_Hoechstpreis_Datum         "Höchstpreis am [%1$ta, %1$td.%1$tm., %1$tH:%1$tMh]"            <time>        (Tankerkoenig, Tankerkoenig_Preise_Datum)
+
+Number      Tankstelle_Frei_A_Diesel_Anzahl_Preisaenderungen_heute    "Freie A: #Änderungen [%d]"
+
+Switch      Tankstelle_Alexa_Echo_Sag_den_Dieselpreis                 "Triggert die Alexa-Routine 'Alexa, was kostet der Diesel?'"    <price>                                                    {alexa="PowerState" [name="Dieselpreis"]}

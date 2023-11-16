@@ -1,0 +1,83 @@
+// jp 3.8.2023
+// OH4: 18.09.2023
+
+val telegramBot_ID = "your ID"
+
+rule "Tankstelle_Frei_A_Diesel_Anzahl_Preisaenderungen_heute zurücksetzen"
+when 
+    Time cron "1 1 1 * * ?" // 1:01 Uhr und 1 Sekunde
+then 
+    Tankstelle_Frei_A_Diesel_Anzahl_Preisaenderungen_heute.sendCommand(0)
+end 
+
+rule "Diesel-Preis Hoch-/Tief-Meldungen - Daten von Tankerkönig"
+when 
+    Item Tankstelle_Frei_A_Diesel changed or
+    Item triggerTankerkoenig changed
+then 
+    val log_level = 10
+    val telegramAction = getActions("telegram", "telegram:telegramBot:" + telegramBot_ID)
+
+    Tankstelle_Frei_A_Diesel_Datum.sendCommand(now.toLocalDateTime().toString()) // Dieselpreis hat sich "jetzt" geändert
+    val current_Dieselpreis =  Float::parseFloat(Tankstelle_Frei_A_Diesel.state.toString) // aktueller Dieselpreis || Tankstelle_Frei_A_Diesel.state im Format 1.699 
+
+    val min_Dieselpreis_innerhalb_7Tagen = Float::parseFloat(Tankstelle_Frei_A_Diesel.minimumSince(now.minusDays(7)).state.toString) // https://www.openhab.org/docs/configuration/persistence.html
+    val min_Dieselpreis_innerhalb_7Tagen_Timestamp = Tankstelle_Frei_A_Diesel.minimumSince(now.minusDays(7)).getTimestamp 
+    val min_Dieselpreis_innerhalb_7Tagen_previousState = Tankstelle_Frei_A_Diesel_7Tage_Tiefpreis.state
+    val min_Dieselpreis_innerhalb_7Tagen_Timestamp_previousState = Tankstelle_Frei_A_Diesel_7Tage_Tiefpreis_Datum.state
+    Tankstelle_Frei_A_Diesel_7Tage_Tiefpreis.sendCommand(min_Dieselpreis_innerhalb_7Tagen)
+    Tankstelle_Frei_A_Diesel_7Tage_Tiefpreis_Datum.sendCommand(min_Dieselpreis_innerhalb_7Tagen_Timestamp.toLocalDateTime.toString)
+
+    val max_Dieselpreis_innerhalb_7Tagen = Float::parseFloat(Tankstelle_Frei_A_Diesel.maximumSince(now.minusDays(7)).state.toString) 
+    val max_Dieselpreis_innerhalb_7Tagen_Timestamp = Tankstelle_Frei_A_Diesel.maximumSince(now.minusDays(7)).getTimestamp
+    val max_Dieselpreis_innerhalb_7Tagen_previousState = Tankstelle_Frei_A_Diesel_7Tage_Hoechstpreis.state
+    val max_Dieselpreis_innerhalb_7Tagen_Timestamp_previousState = Tankstelle_Frei_A_Diesel_7Tage_Hoechstpreis_Datum.state 
+    Tankstelle_Frei_A_Diesel_7Tage_Hoechstpreis.sendCommand(max_Dieselpreis_innerhalb_7Tagen)
+    Tankstelle_Frei_A_Diesel_7Tage_Hoechstpreis_Datum.sendCommand(max_Dieselpreis_innerhalb_7Tagen_Timestamp.toLocalDateTime.toString)
+
+    if (Tankstelle_Frei_A_Diesel.state != Tankstelle_Frei_A_Diesel.previousState) // Preisänderung -> Anzahl hochzählen
+        Tankstelle_Frei_A_Diesel_Anzahl_Preisaenderungen_heute.sendCommand(Float::parseFloat(Tankstelle_Frei_A_Diesel_Anzahl_Preisaenderungen_heute.state.toString) + 1.0) 
+
+     if (current_Dieselpreis == min_Dieselpreis_innerhalb_7Tagen) {
+        if (log_level > 0) logInfo("jpRules", "Tankerkönig: Diesel-Preis neuer Tiefstand: " + current_Dieselpreis +
+                                    " - alter Tiefpreis war " + min_Dieselpreis_innerhalb_7Tagen_previousState + " vom " + min_Dieselpreis_innerhalb_7Tagen_Timestamp_previousState)
+        telegramAction.sendTelegram("🚙 Diesel Tief: " + current_Dieselpreis + "€")
+    } else
+    if (current_Dieselpreis == max_Dieselpreis_innerhalb_7Tagen) {
+        if (log_level > 0) logInfo("jpRules", "Tankerkönig: Diesel-Preis neuer Höchststand: " + current_Dieselpreis +
+                                    " - alter Höchstpreis war " + max_Dieselpreis_innerhalb_7Tagen_previousState + " vom " + max_Dieselpreis_innerhalb_7Tagen_Timestamp_previousState)
+        telegramAction.sendTelegram("🚗 Diesel Hoch: " + current_Dieselpreis + "€")
+    }
+
+    if (log_level > 0) logInfo("jpRules", "Tankerkönig: Diesel aktuell=" + current_Dieselpreis + 
+                                            " Tiefpreis=" + min_Dieselpreis_innerhalb_7Tagen + " Höchstpreis=" + max_Dieselpreis_innerhalb_7Tagen + 
+                                            " # Preisänderungen heute=" + Tankstelle_Frei_A_Diesel_Anzahl_Preisaenderungen_heute.state)
+
+end 
+
+// The End
+
+
+
+/* https://creativecommons.tankerkoenig.de/json/prices.php?ids=xxxxxxxxx,yyyyyyyyyyyyy,zzzzzzzzzzzz&apikey=aaaaaaaaaaaaaaaaaaaaaaaa
+
+{
+    "ok": true,
+    "license": "CC BY 4.0 -  https:\/\/creativecommons.tankerkoenig.de",
+    "data": "MTS-K",
+    "prices": {
+        "60c0eefa-d2a8-4f5c-82cc-b5244ecae955": {
+            "status": "open",
+            "e5": false,
+            "e10": false,
+            "diesel": 1.234
+        },
+        "4429a7d9-fb2d-4c29-8cfe-2ca90323f9f8": {
+            "status": "open",
+            "e5": 1.234,
+            "e10": 1.234,
+            "diesel": 1.234
+        }
+    }
+}
+*/

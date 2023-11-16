@@ -1,0 +1,18 @@
+Strategies
+{
+    everyMinute : "0 * * * * ?"
+    every3Minutes : "0 */3 * * * ?"
+    everyHalf : "0 30 * * * ?"
+    everyHour : "0 0 * * * ?"
+    everyDay : "0 0 0 * * ?"
+    default = everyChange, restoreOnStartup
+}
+Items
+{
+
+    Tankerkoenig_Preise*: strategy = everyChange, restoreOnStartup 
+
+}
+
+
+
