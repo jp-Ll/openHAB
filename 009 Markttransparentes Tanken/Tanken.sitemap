@@ -1,0 +1,27 @@
+sitemap Tanken label="Tanken" icon="car" {
+    // Default item=Tankerkoenig
+
+    Default item=Tankstelle_Frei_A_Diesel
+    Default item=Tankstelle_Frei_A_Diesel_Datum
+    // Number     Tankstelle_Frei_A_E10             "Freie Tankstelle AE10 [%,.3f]"        <car>    (Tankerkoenig)    {channel="tankerkoenig:station:0fed0de32c:9dd0a482b6:e10"}
+    // Number     Tankstelle_Frei_A_E5              "Freie Tankstelle AE5 [%,.3f]"         <car>    (Tankerkoenig)    {channel="tankerkoenig:station:0fed0de32c:9dd0a482b6:e5"}
+    Default item=Tankstelle_Frei_A_Station_Open 
+
+    Default item=Tankstelle_Frei_A_Diesel_7Tage_Tiefpreis    
+    Default item=Tankstelle_Frei_A_Diesel_7Tage_Tiefpreis_Datum       
+
+    Default item=Tankstelle_Frei_A_Diesel_7Tage_Hoechstpreis      
+    Default item=Tankstelle_Frei_A_Diesel_7Tage_Hoechstpreis_Datum 
+
+    Default item=Tankstelle_Frei_A_Diesel_Anzahl_Preisaenderungen_heute
+    
+    Switch  item=Sitemap_Chart_Skala  label="Skala"    icon="line"   mappings=[0="Hide", 1="Hour", 2="Half Day", 3="Day", 4="Week"]
+    Chart item=Tankerkoenig_Preise  service="influxdb" period=h    refresh=30000   visibility=[Sitemap_Chart_Skala==1]
+    Chart item=Tankerkoenig_Preise  service="influxdb" period=12h  refresh=30000   visibility=[Sitemap_Chart_Skala==2]
+    Chart item=Tankerkoenig_Preise  service="influxdb" period=D    refresh=30000   visibility=[Sitemap_Chart_Skala==3, Sitemap_Chart_Skala=="Uninitialized"]
+    Chart item=Tankerkoenig_Preise  service="influxdb" period=W    refresh=30000   visibility=[Sitemap_Chart_Skala==4]
+       
+}
+ 
+ 
+ 
