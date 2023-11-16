@@ -66,13 +66,13 @@ end
     "license": "CC BY 4.0 -  https:\/\/creativecommons.tankerkoenig.de",
     "data": "MTS-K",
     "prices": {
-        "60c0eefa-d2a8-4f5c-82cc-b5244ecae955": {
+        "xxxxxxxxxxxxxx-d2a8-4f5c-82cc-xxxxxxxxxxxxxxx": {
             "status": "open",
             "e5": false,
             "e10": false,
             "diesel": 1.234
         },
-        "4429a7d9-fb2d-4c29-8cfe-2ca90323f9f8": {
+        "xxxxxxxxxxxxx-fb2d-4c29-8cfe-xxxxxxxxxxxxxxx": {
             "status": "open",
             "e5": 1.234,
             "e10": 1.234,
